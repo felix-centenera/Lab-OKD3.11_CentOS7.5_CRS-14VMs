@@ -123,7 +123,7 @@ Prepare  loadbalancers
 ansible-playbook -i /root/ansible/inventories/loadbalancerinfra /root/ansible/playbooks/loadbalancersinfra.yaml
 ansible-playbook -i /root/ansible/inventories/loadbalancermaster /root/ansible/playbooks/loadbalancersmaster.yaml
 ```
-Restart the nodes
+Restart the loadbalancers nodes
 
 
 Prepare  Gluster
@@ -131,7 +131,7 @@ Prepare  Gluster
 ```
 ansible-playbook -i /root/ansible/inventories/ocp /root/ansible/playbooks/glusterpreparation.yml
 ```
-Restart the nodes
+Restart the gluster nodes
 
 Prepare the rest of the nodes for OKD 3.11
 -----------------------------------------
