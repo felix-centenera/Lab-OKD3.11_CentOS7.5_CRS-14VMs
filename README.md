@@ -8,7 +8,7 @@ This document describe the process to install OKD 3.11 (Free OpenShift 3.11) in 
 
 Tested under the next Configuration
 --------------------------------
-Host Fedora release 29 
+Host Fedora release 29
 
 VirtualBox 6.0.4
 
@@ -73,21 +73,21 @@ CRS (Container Ready Storage) as Storage solution. DEPLOY CONTAINERIZED STORAGE 
 
 Details
 --------
-User Virtual Machine:
+Users Virtual Machine:
 
-user: root
+    user: root
 
-password: vagrant
+    password: vagrant
 
-user: vagrant
+    user: vagrant
 
-password: vagrant
+    password: vagrant
 
 Openshift admin user:
 
-user: admin
+    user: admin
 
-password: r3dh4t1!
+    password: r3dh4t1!
 
 
 
