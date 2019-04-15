@@ -158,7 +158,11 @@ ansible-playbook -i /root/ansible/inventories/ocp /root/ansible/playbooks/postin
 
 Deploy the console 3.11
 --------------------------------------------
-Modify the inventory, delete or comment the next parameter "openshift_web_console_install=false". Then run the playbook.
+
+Modify the inventory, delete or comment the next parameter "openshift web console install=false", also you can change the parameter to true.
+
+Then run the playbook. ;)
+
 
 ```
 vi /root/ansible/inventories/ocp
@@ -169,8 +173,6 @@ ansible-playbook -i /root/ansible/inventories/ocp /root/release-3.11/playbooks/o
 ```
 
 NOTE:
-
-Modify the inventory, delete or comment the next parameter "openshift web console install=false", also you can change the parameter to true.
 
 Why? Usually the console is deployed in first instance, but the OCP installation will modified the /etc/resolve.conf with the IP of the node, this is the expected and correct funcionallity, but in Virtualbox we will need to change this IP in the /etc/resolv.conf with  the VirtualBox bridge IP, otherwise the nodes will not be able to acces to internet or resolve the routes. This change for VirtualBox has been automatizated with the playbook "postinstallation". If we deploy the console in first instance, the installation will fail as  one of the task from the Ansible installation will not be able to check that the route of the Console is working. This is the reason why we deploy OpenShift without the console, then we modified the /etc/resolve.conf with the playbook "postinstallation" and then we deploy the console.
 
