@@ -8,6 +8,8 @@ This document describe the process to install OKD 3.11 (Free OpenShift 3.11) in 
 
 Tested under the next Configuration
 --------------------------------
+Host Fedora release 29 
+
 VirtualBox 6.0.4
 
 Vagrant version: Installed Version: 2.2.4
