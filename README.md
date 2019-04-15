@@ -3,7 +3,11 @@ Deploy OKD 3.11  (Free OpenShift 3.11)  & CentOS 7 & VirtualBox & Vagrant & Ansi
 
 Description
 --------------------------------
-This document describe the process to install OKD 3.11 (Free OpenShift 3.11) in VirtualBox. Vagrant generate the VMs and resources for us. Ansible will install requistes and OKD 3.11 for us.
+* This document describe the process to install OKD 3.11 (Free OpenShift 3.11) in VirtualBox. Vagrant generate the VMs and resources for us. Ansible will install requistes and OKD 3.11 for us.
+
+* You can check the hardware requisites in Diagram/OLD LAB11.odd. It is not a mandatory requirement the disk sizing, as VirtualBox will no required the full size disk.  
+
+* You can change the harware definition of the VirtualMachines in the vagrantfile configuration. "vagrant/vagrantfile"
 
 
 Tested under the next Configuration
