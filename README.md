@@ -7,7 +7,7 @@ Description
 
 * You can check the hardware requisites in Diagram/OLD LAB11.odd. It is not a mandatory requirement the disk sizing, as VirtualBox will no required the full size disk.  
 
-* You can change the harware definition of the VirtualMachines in the vagrantfile configuration. "vagrant/vagrantfile"
+*  You can change the harware definition of the VirtualMachines in the vagrantfile configuration. "vagrant/vagrantfile".
 
 
 Tested under the next Configuration
@@ -71,7 +71,7 @@ Infrastructure
 
 CRS (Container Ready Storage) as Storage solution. DEPLOY CONTAINERIZED STORAGE IN INDEPENDENT MODE
 
-![alt text](https://github.com/felix-centenera/OKD3.11_CentOS7.5_CRS/blob/master/Diagramas/diagrama.png)
+![alt text](https://github.com/felix-centenera/OKD3.11_CentOS7.5_CRS/blob/master/Diagram/diagrama.png)
 
 
 
