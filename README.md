@@ -65,7 +65,8 @@ Infrastructure
 
 CRS (Container Ready Storage) as Storage solution. DEPLOY CONTAINERIZED STORAGE IN INDEPENDENT MODE
 
-![alt text](https://gitlab.vass.es/vass/ocp-vagrant/raw/Origin3.11/img/Infraestruture.png)
+![alt text](https://github.com/felix-centenera/OKD3.11_CentOS7.5_CRS/blob/master/Diagramas/diagrama.png)
+
 
 
 Details
@@ -210,31 +211,57 @@ HAProxy password: admin
 
 
 CONSOLES:
+
+
 https://consoleocp.192.168.33.20.xip.io:8443/console
+
 https://grafana-openshift-monitoring.app.192.168.33.2.xip.io/
+
 https://registry-console-default.app.192.168.33.2.xip.io/
+
 https://console.app.192.168.33.2.xip.io/k8s/cluster/projects
+
 http://192.168.33.21:1936/haproxy?stats
+
 http://192.168.33.20:1936/haproxy?stats
+
 http://192.168.33.2:1936/haproxy?stats
 
 
 Sources:
+
 https://docs.openshift.com/container-platform/3.11/welcome/index.html
+
 https://docs.okd.io/3.11/welcome/index.html
+
 https://access.redhat.com/documentation/en-us/red_hat_cloudforms/4.6/html/high_availability_guide/configuring_haproxy
+
 https://www.linuxtechi.com/setup-glusterfs-storage-on-centos-7-rhel-7/
+
 https://www.maquinasvirtuales.eu/instalar-glusterfs-en-centos-7/
+
 https://access.redhat.com/documentation/en-us/red_hat_gluster_storage/3.3/html/container-native_storage_for_openshift_container_platform/chap-documentation-container_ready_storage#CRS_Installing_Red_Hat_Storage_Server_on_Red_Hat_Enterprise_Linux_Layered_Install
+
 https://www.linuxtechi.com/setup-glusterfs-storage-on-centos-7-rhel-7/
+
 https://docs.gluster.org/en/latest/Install-Guide/Install/#for-red-hatcentos
+
 https://torusware.com/es/blog/2017/02/openshift-origin-jenkins-almacenamiento-persistente-glusterfs/
+
 https://access.redhat.com/articles/3403951
+
 https://access.redhat.com/articles/2176281#fn:8
+
 https://access.redhat.com/articles/2356261
+
 https://medium.com/@wilson.wilson/install-heketi-and-glusterfs-with-openshift-to-allow-dynamic-persistent-volume-management-89156340b2bd
+
 https://glusterdocs-beta.readthedocs.io/en/latest/install-guide/Install.html
+
 http://mirror.centos.org/centos-7/7.6.1810/storage/x86_64/gluster-3.12/
+
 https://www.unixmen.com/install-glusterfs-server-client-centos-7/
+
 https://github.com/gluster/gluster-block
+
 https://buildlogs.centos.org/centos/7/storage/x86_64/gluster-5/
