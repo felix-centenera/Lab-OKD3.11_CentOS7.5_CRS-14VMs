@@ -1,0 +1,32 @@
+#!/bin/bash
+set -eo pipefail
+
+
+die(){
+  echo "$1"
+  exit $2
+}
+
+usage(){
+  echo "$0 [path]"
+  echo "  path  The directory where the backup will be stored"
+  echo "        /backup_etcd/\$(hostname)/\$(date +%Y%m%d) by default"
+  echo "Examples:"
+  echo "    $0 /my/mountpoint/\$(hostname)"
+}
+
+etc_etcd(){
+  mkdir -p ${BACKUPLOCATION}/etc/
+  echo "Exporting etcd configuration files to ${BACKUPLOCATION}"
+  cp -aR /etc/etcd ${BACKUPLOCATION}/etc/etcd
+}
+
+
+BACKUPLOCATION=${1:-"/backup_etcd/$(hostname)/$(date +%Y%m%d)"}
+
+mkdir -p ${BACKUPLOCATION}
+
+etc_etcd
+
+
+exit 0

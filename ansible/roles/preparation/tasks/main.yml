@@ -1,0 +1,73 @@
+---
+- name: Add repository
+  yum_repository:
+    name: CentOS OpenShift Origin
+    description: CentOS OpenShift Origin
+    baseurl: http://mirror.centos.org/centos/7/paas/x86_64/openshift-origin311
+    gpgcheck: no
+    enabled: yes
+
+- name: Ensure required packages are installed
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ yum_packages }}"
+
+- name: remove any existing docker-storage config file
+  file:
+    path: /etc/sysconfig/docker-storage-setup
+    state: absent
+
+- name: Remove repository (and clean up left-over metadata)
+  yum_repository:
+    name: epel.repo
+    state: absent
+  notify: yum-clean-metadata
+
+- name: Remove repository (and clean up left-over metadata)
+  yum_repository:
+    name: epel
+    state: absent
+  notify: yum-clean-metadata
+
+- name: Enable insecure docker registry
+  shell: sed -i "s|OPTIONS=.*|OPTIONS='--selinux-enabled --log-opt max-size=1M --log-opt max-file=3 --insecure-registry 172.30.0.0/16'|g" /etc/sysconfig/docker
+
+- name: Configure Docker’s storage files & driver
+  template:
+    src: docker-storage-setup.j2
+    dest: /etc/sysconfig/docker-storage-setup
+
+- name: docker-storage-setup
+  shell: docker-storage-setup
+
+- name: start docker
+  service: name=docker state=restarted enabled=true
+
+- name: enable docker service
+  service: name=docker enabled=true state=started
+
+- name: The dm_multipath module is loaded on all OpenShift Container Platform nodes.
+  shell: modprobe dm_multipath
+
+- name: The fuse module is loaded on all OpenShift Container Platform nodes.
+  shell: modprobe fuse
+
+- name: Copy dm_multipath.conf configuration file
+  template:
+   src: dm_multipath.conf.j2
+   dest: /etc/modules-load.d/dm_multipath.conf
+   mode: 0644
+
+- name: Copy  fuse configuration file
+  template:
+   src: fuse.conf.j2
+   dest: /etc/modules-load.d/fuse.conf
+   mode: 0644
+
+- name: Ensure SELinux is in enforcing mode
+  lineinfile:
+    dest: /etc/selinux/config
+    backup: yes
+    regexp: '^SELINUX='
+    line: 'SELINUX=enforcing'

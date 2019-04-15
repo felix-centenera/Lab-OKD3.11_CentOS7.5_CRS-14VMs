@@ -1,0 +1,132 @@
+#!/bin/bash
+set -eo pipefail
+ORIGINFILES="origin-master origin-master-api origin-master-controllers origin-node"
+OCPFILES="atomic-openshift-master atomic-openshift-master-api atomic-openshift-master-controllers atomic-openshift-node"
+SSHFILES="ssh_config sshd_config"
+
+die(){
+  echo "$1"
+  exit $2
+}
+
+usage(){
+  echo "$0 [path]"
+  echo "  path  The directory where the backup will be stored"
+  echo "        /backup/\$(hostname)/\$(date +%Y%m%d) by default"
+  echo "Examples:"
+  echo "    $0 /my/mountpoint/\$(hostname)"
+}
+
+ocpfiles(){
+  mkdir -p ${BACKUPLOCATION}/etc/sysconfig
+  echo "Exporting OCP related files to ${BACKUPLOCATION}"
+  cp -aR /etc/origin ${BACKUPLOCATION}/etc
+  for file in ${ORIGINFILES} ${OCPFILES}
+  do
+    if [ -f /etc/sysconfig/${file} ]
+    then
+      cp -aR /etc/sysconfig/${file} ${BACKUPLOCATION}/etc/sysconfig/
+    fi
+  done
+}
+
+otherfiles(){
+  mkdir -p ${BACKUPLOCATION}/etc/sysconfig
+  mkdir -p ${BACKUPLOCATION}/etc/pki/ca-trust/source/anchors
+  mkdir -p ${BACKUPLOCATION}/root
+  echo "Exporting other important files to ${BACKUPLOCATION}"
+  if [ -f /etc/sysconfig/flanneld ]
+  then
+    cp -a /etc/sysconfig/flanneld \
+      ${BACKUPLOCATION}/etc/sysconfig/
+  fi
+
+  if [ -f /etc/fstab ]
+  then
+    cp -a /etc/fstab \
+      ${BACKUPLOCATION}/etc/
+  fi
+
+  if [ -f /etc/passwd ]
+  then
+    cp -a /etc/passwd \
+      ${BACKUPLOCATION}/etc/
+  fi
+
+  if [ -f /etc/shadow ]
+  then
+    cp -a /etc/shadow \
+      ${BACKUPLOCATION}/etc/
+  fi
+
+  if [ -f /etc/resolv.conf ]
+  then
+    cp -a /etc/resolv.conf \
+      ${BACKUPLOCATION}/etc/
+  fi
+
+  if [ -f /etc/group ]
+  then
+    cp -a /etc/group \
+      ${BACKUPLOCATION}/etc/
+  fi
+
+  export > ${BACKUPLOCATION}/variables
+
+  cp -aR /etc/sysconfig/{iptables,docker-*} \
+    ${BACKUPLOCATION}/etc/sysconfig/
+  if [ -d /etc/cni ]
+  then
+    cp -aR /etc/cni ${BACKUPLOCATION}/etc/
+  fi
+
+  if [ -d /root/.kube ]
+  then
+    cp -aR /root/.kube ${BACKUPLOCATION}/root
+  fi
+  cp -aR /root/anaconda-ks.cfg ${BACKUPLOCATION}/root
+  cp -aR /etc/dnsmasq* ${BACKUPLOCATION}/etc/
+  cp -aR /etc/pki/ca-trust/source/anchors/* \
+    ${BACKUPLOCATION}/etc/pki/ca-trust/source/anchors/
+}
+
+network(){
+  mkdir -p ${BACKUPLOCATION}/network-scripts
+  mkdir -p ${BACKUPLOCATION}/sshdconf
+  echo "Exporting network important files to ${BACKUPLOCATION}"
+  cp -aR /etc/sysconfig/network-scripts   ${BACKUPLOCATION}/network-scripts ; find ${BACKUPLOCATION}/network-scripts -type l -exec rm -f {} \;
+  for file in ${SSHFILES}
+  do
+    if [ -f /etc/ssh/${file} ]
+    then
+      cp -aR /etc/ssh/${file} ${BACKUPLOCATION}/sshdconf
+    fi
+  done
+
+    if [ -f /etc/sysconfig/network ]
+    then
+      cp -aR /etc/sysconfig/network ${BACKUPLOCATION}/etc/sysconfig/network
+    fi
+}
+
+packagelist(){
+  echo "Creating a list of rpms installed in ${BACKUPLOCATION}"
+  rpm -qa | sort > ${BACKUPLOCATION}/packages.txt
+}
+
+if [[ ( $@ == "--help") ||  $@ == "-h" ]]
+then
+  usage
+  exit 0
+fi
+
+BACKUPLOCATION=${1:-"/backup/$(hostname)/$(date +%Y%m%d)"}
+
+mkdir -p ${BACKUPLOCATION}
+
+ocpfiles
+otherfiles
+network
+packagelist
+
+exit 0

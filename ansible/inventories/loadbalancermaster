@@ -1,0 +1,7 @@
+[loadbalancermaster]
+lb-one.192.168.33.3.xip.io
+lb-two.192.168.33.4.xip.io
+
+[loadbalancermaster:vars]
+ansible_user=root
+yum_packages=['keepalived','haproxy','psmisc']

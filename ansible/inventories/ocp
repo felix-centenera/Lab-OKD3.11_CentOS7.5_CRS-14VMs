@@ -1,0 +1,136 @@
+# Create an OSEv3 group that contains the master, nodes and etcd.
+[OSEv3:children]
+masters
+nodes
+etcd
+glusterfs
+glusterfs_registry
+
+# Set variables common for all OSEv3 hosts
+[OSEv3:vars]
+ansible_ssh_user=root
+openshift_deployment_type=origin
+openshift_release=v3.11
+openshift_disable_check=memory_availability,disk_availability,docker_storage,package_version,docker_image_availability,package_availability
+os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
+os_firewall_use_firewalld=True
+
+
+openshift_web_console_install=false
+
+#Configuring External GlusterFS
+openshift_master_dynamic_provisioning_enabled=True
+
+openshift_hosted_registry_storage_kind=glusterfs
+openshift_hosted_registry_storage_volume_size=10Gi
+openshift_hosted_registry_selector='node-role.kubernetes.io/infra=true'
+
+openshift_storage_glusterfs_namespace=app-storage
+openshift_storage_glusterfs_storageclass=true
+openshift_storage_glusterfs_storageclass_default=false
+openshift_storage_glusterfs_block_deploy=true
+openshift_storage_glusterfs_block_host_vol_size=10
+openshift_storage_glusterfs_block_storageclass=true
+openshift_storage_glusterfs_block_storageclass_default=false
+openshift_storage_glusterfs_is_native=False
+openshift_storage_glusterfs_heketi_is_native=true
+openshift_storage_glusterfs_heketi_executor=ssh
+openshift_storage_glusterfs_heketi_ssh_port=22
+openshift_storage_glusterfs_heketi_ssh_user=root
+openshift_storage_glusterfs_heketi_ssh_sudo=false
+openshift_storage_glusterfs_heketi_ssh_keyfile="/root/.ssh/id_rsa"
+
+openshift_storage_glusterfs_registry_namespace=infra-storage
+openshift_storage_glusterfs_registry_block_deploy=true
+openshift_storage_glusterfs_registry_block_host_vol_size=10
+openshift_storage_glusterfs_registry_block_storageclass=true
+openshift_storage_glusterfs_registry_block_storageclass_default=false
+openshift_storage_glusterfs_registry_is_native=false
+openshift_storage_glusterfs_registry_heketi_is_native=true
+openshift_storage_glusterfs_registry_heketi_executor=ssh
+openshift_storage_glusterfs_registry_heketi_ssh_port=22
+openshift_storage_glusterfs_registry_heketi_ssh_user=root
+openshift_storage_glusterfs_registry_heketi_ssh_sudo=false
+openshift_storage_glusterfs_registry_heketi_ssh_keyfile="/root/.ssh/id_rsa"
+
+
+# Defining htpasswd users
+# admin:r3dh4t1!
+openshift_master_htpasswd_users={'admin': '$apr1$JsF6SZqF$V6M9k2wAfhQIi5n7WCzEQ.'}
+
+# Native high availability (default cluster method)
+# If no lb group is defined, the installer assumes that a load balancer has
+# been preconfigured. For installation the value of
+# openshift_master_cluster_hostname must resolve to the load balancer
+# or to one or all of the masters defined in the inventory if no load
+# balancer is present.
+#openshift_master_cluster_method=native
+openshift_master_cluster_hostname=masterinterno.192.168.33.21.xip.io
+openshift_master_cluster_public_hostname=consoleocp.192.168.33.20.xip.io
+
+# default subdomain to use for exposed routes, you should have wildcard dns
+# for *.apps.test.example.com that points at your infra nodes which will run
+# your router
+openshift_master_default_subdomain=app.192.168.33.2.xip.io
+
+
+# enable ntp on masters to ensure proper failover
+openshift_clock_enabled=true
+
+# Router selector (optional)
+# Router will only be created if nodes matching this label are present.
+openshift_router_selector='node-role.kubernetes.io/infra=true'
+
+# Registry selector (optional)
+# Registry will only be created if nodes matching this label are present.
+openshift_registry_selector='node-role.kubernetes.io/infra=true'
+
+# Template Service Broker selector
+template_service_broker_selector={"role":"infra"}
+
+[masters]
+master-one.192.168.33.7.xip.io openshift_ip=192.168.33.7 openshift_public_ip=192.168.33.7  openshift_public_hostname=master-one.192.168.33.7.xip.io
+master-two.192.168.33.8.xip.io openshift_ip=192.168.33.8 openshift_public_ip=192.168.33.8  openshift_public_hostname=master-two.192.168.33.8.xip.io
+master-three.192.168.33.9.xip.io openshift_ip=192.168.33.9 openshift_public_ip=192.168.33.9 openshift_public_hostname=master-three.192.168.33.9.xip.io
+
+[etcd]
+master-one.192.168.33.7.xip.io openshift_ip=192.168.33.7 openshift_public_ip=192.168.33.7  openshift_public_hostname=master-one.192.168.33.7.xip.io
+master-two.192.168.33.8.xip.io openshift_ip=192.168.33.8 openshift_public_ip=192.168.33.8  openshift_public_hostname=master-two.192.168.33.8.xip.io
+master-three.192.168.33.9.xip.io openshift_ip=192.168.33.9 openshift_public_ip=192.168.33.9 openshift_public_hostname=master-three.192.168.33.9.xip.io
+
+[nodes]
+master-one.192.168.33.7.xip.io openshift_ip=192.168.33.7 openshift_public_ip=192.168.33.7  openshift_public_hostname=master-one.192.168.33.7.xip.io openshift_node_group_name='node-config-master'
+master-two.192.168.33.8.xip.io openshift_ip=192.168.33.8 openshift_public_ip=192.168.33.8  openshift_public_hostname=master-two.192.168.33.8.xip.io openshift_node_group_name='node-config-master'
+master-three.192.168.33.9.xip.io openshift_ip=192.168.33.9 openshift_public_ip=192.168.33.9 openshift_public_hostname=master-three.192.168.33.9.xip.io openshift_node_group_name='node-config-master'
+infra-one.192.168.33.10.xip.io openshift_ip=192.168.33.10 openshift_public_ip=192.168.33.10  openshift_public_hostname=infra-one.192.168.33.10.xip.io openshift_node_group_name='node-config-infra'
+infra-two.192.168.33.11.xip.io openshift_ip=192.168.33.11 openshift_public_ip=192.168.33.11  openshift_public_hostname=infra-two.192.168.33.11.xip.io openshift_node_group_name='node-config-infra'
+app-one.192.168.33.12.xip.io openshift_ip=192.168.33.12 openshift_public_ip=192.168.33.12  openshift_public_hostname=app-one.192.168.33.12.xip.io openshift_node_group_name='node-config-compute'
+app-two.192.168.33.13.xip.io openshift_ip=192.168.33.13 openshift_public_ip=192.168.33.13  openshift_public_hostname=app-two.192.168.33.13.xip.io openshift_node_group_name='node-config-compute'
+
+[glusterfs]
+gluster-one.192.168.33.14.xip.io   glusterfs_ip=192.168.33.14 glusterfs_devices='[ "/dev/sdb" ]'
+gluster-two.192.168.33.15.xip.io   glusterfs_ip=192.168.33.15 glusterfs_devices='[ "/dev/sdb" ]'
+gluster-three.192.168.33.16.xip.io glusterfs_ip=192.168.33.16 glusterfs_devices='[ "/dev/sdb" ]'
+
+[glusterfs:vars]
+yum_packages=['glusterfs-libs.x86_64','glusterfs-server.x86_64','glusterfs.x86_64']
+
+[glusterfs_registry]
+gluster-one.192.168.33.14.xip.io   glusterfs_ip=192.168.33.14 glusterfs_devices='[ "/dev/sdb" ]'
+gluster-two.192.168.33.15.xip.io   glusterfs_ip=192.168.33.15 glusterfs_devices='[ "/dev/sdb" ]'
+gluster-three.192.168.33.16.xip.io glusterfs_ip=192.168.33.16 glusterfs_devices='[ "/dev/sdb" ]'
+
+[preparation:children]
+nodes
+
+[preparation:vars]
+ansible_user=root
+yum_packages=['docker-1.13.1','glusterfs-fuse']
+
+[postinstallation:children]
+nodes
+
+[postinstallation:vars]
+ansible_user=root
+yum_packages_post_install=['e2fsprogs']

@@ -1,0 +1,4 @@
+---
+- hosts: postinstallation
+  roles:
+    - postinstallation

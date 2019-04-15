@@ -1,0 +1,13 @@
+- name: Ensure required packages are installed
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ yum_packages_post_install }}"
+
+- name: Configuring resolv.conf
+  template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
+
+- name: Make resolv.conf inmutable.
+  shell: chattr +i /etc/resolv.conf

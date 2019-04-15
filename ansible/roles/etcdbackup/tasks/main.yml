@@ -1,0 +1,71 @@
+---
+
+- name: Create backup folder
+  file:
+   path: /backup_etcd/{{inventory_hostname}}
+   state: directory
+   mode: 0755
+
+- name: Create scripts backup folder
+  file:
+    path: /backup_etcd/backupscript_etcd
+    state: directory
+    mode: 0755
+
+- name: Load script backup in all the machines
+  template:
+    src: backup_etcd_db.sh.j2
+    dest: /backup_etcd/backupscript_etcd/backup_etcd_db.sh
+
+- name: Load script backup in all the machines
+  template:
+    src: backup_etcd_conf.sh.j2
+    dest: /backup_etcd/backupscript_etcd/backup_etcd_conf.sh
+
+- name: "Excute backup etcd configuration files"
+  command: sh /backup_etcd/backupscript_etcd/backup_etcd_conf.sh
+
+- name: Check status ETCD
+  #shell: source /etc/etcd/etcd.conf && export ETCDCTL_API=3 && ETCD_ALL_ENDPOINTS=` etcdctl  --cert=$ETCD_PEER_CERT_FILE --key=$ETCD_PEER_KEY_FILE --cacert=$ETCD_TRUSTED_CA_FILE --endpoints=$ETCD_LISTEN_CLIENT_URLS --write-out=fields   member list | awk '/ClientURL/{printf "%s%s",sep,$3; sep=","}'` && etcdctl  --cert=$ETCD_PEER_CERT_FILE --key=$ETCD_PEER_KEY_FILE --cacert=$ETCD_TRUSTED_CA_FILE --endpoints=$ETCD_ALL_ENDPOINTS   member list   status | cut -d "," -f3 | head -1
+  shell: source /etc/etcd/etcd.conf && export ETCDCTL_API=3 && ETCD_ALL_ENDPOINTS=` etcdctl  --cert=$ETCD_PEER_CERT_FILE --key=$ETCD_PEER_KEY_FILE --cacert=$ETCD_TRUSTED_CA_FILE --endpoints=$ETCD_LISTEN_CLIENT_URLS --write-out=fields   member list | awk '/ClientURL/{printf "%s%s",sep,$3; sep=","}'` && etcdctl  --cert=$ETCD_PEER_CERT_FILE --key=$ETCD_PEER_KEY_FILE --cacert=$ETCD_TRUSTED_CA_FILE --endpoints=$ETCD_LISTEN_CLIENT_URLS  member list | grep `etcdctl  --cert=$ETCD_PEER_CERT_FILE --key=$ETCD_PEER_KEY_FILE --cacert=$ETCD_TRUSTED_CA_FILE --endpoints=$ETCD_ALL_ENDPOINTS  endpoint status  2>&1 |  grep true | cut -d "," -f2` | cut -d "," -f3
+  register: etcdhealthynode
+
+- name: Stop service etcd.service, if started
+  service:
+    name: etcd.service
+    state: stopped
+  when: 'ansible_hostname in etcdhealthynode.stdout'
+
+- name: "Excute backup etcd db"
+  command: sh /backup_etcd/backupscript_etcd/backup_etcd_db.sh
+  when: 'ansible_hostname in etcdhealthynode.stdout'
+
+- name: Start service etcd.service, if not started
+  service:
+    name: etcd.service
+    state: started
+  when: 'ansible_hostname in etcdhealthynode.stdout'
+
+
+- name: Tar backup created
+  archive:
+    path: /backup_etcd/{{inventory_hostname}}/
+    dest: /backup_etcd/{{inventory_hostname}}.tgz
+
+
+- name: Remove backup files not Compress
+  file:
+    path: /backup_etcd/{{inventory_hostname}}
+    state: absent
+
+- name:
+  fetch:
+    src: /backup_etcd/{{inventory_hostname}}.tgz
+    #dest: /backup_etcd/cluster_etcd_backup/{{ansible_date_time.date}}
+    dest: /backup_etcd/cluster_etcd_backup/{{ lookup('pipe','date +%Y-%m-%d-%H:%M') }}
+    mode: 0755
+
+- name: Remove backup files Compress
+  file:
+    path: /backup_etcd/{{inventory_hostname}}.tgz
+    state: absent

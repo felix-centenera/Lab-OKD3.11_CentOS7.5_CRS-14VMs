@@ -1,0 +1,369 @@
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.hostmanager.enabled = true
+  config.hostmanager.manage_host = true
+  config.hostmanager.ignore_private_ip = false
+
+  config.vm.define "lb-master-one-okd11" do |app|
+      app.vm.box = "centos/7"
+      config.disksize.size = '15GB'
+      app.vm.hostname = "lb-one.192.168.33.3.xip.io"
+      app.vm.network "private_network", ip: "192.168.33.3"
+      config.vm.provision "shell", path: "./nodes/config.sh"
+      app.vm.provider "virtualbox" do |v|
+          v.name = "lb-master-one-okd11"
+          v.memory = 512
+          v.cpus = 1
+      end
+  end
+  config.vm.define "lb-master-two-okd11" do |app|
+      app.vm.box = "centos/7"
+      config.disksize.size = '15GB'
+      app.vm.hostname = "lb-two.192.168.33.4.xip.io"
+      app.vm.network "private_network", ip: "192.168.33.4"
+      app.vm.provider "virtualbox" do |v|
+          v.name = "lb-master-two-okd11"
+          v.memory = 512
+          v.cpus = 1
+      end
+  end
+
+  config.vm.define "lb-infra-one-okd11" do |app|
+      app.vm.box = "centos/7"
+      config.disksize.size = '15GB'
+      app.vm.hostname = "lb-infra.192.168.33.5.xip.io"
+      app.vm.network "private_network", ip: "192.168.33.5"
+      app.vm.provider "virtualbox" do |v|
+          v.name = "lb-infra-one-okd11"
+          v.memory = 512
+          v.cpus = 1
+      end
+  end
+
+  config.vm.define "lb-infra-two-okd11" do |app|
+      app.vm.box = "centos/7"
+      config.disksize.size = '15GB'
+      app.vm.hostname = "lb-infra.192.168.33.6.xip.io"
+      app.vm.network "private_network", ip: "192.168.33.6"
+      app.vm.provider "virtualbox" do |v|
+          v.name = "lb-infra-two-okd11"
+          v.memory = 512
+          v.cpus = 1
+      end
+  end
+
+  config.vm.define "master-two-okd11" do |app|
+      app.vm.box = "centos/7"
+      app.vm.hostname = "master-two.192.168.33.8.xip.io"
+      app.vm.network "private_network", ip: "192.168.33.8"
+      app.vm.provider "virtualbox" do |v|
+        v.name = "master-two-okd11"
+        v.memory = 3000
+        v.cpus = 1
+        #
+         # Add first disk
+        #
+        unless File.exists?("$HOME/VirtualBox/okd311/master-two/sdb.vdi")
+        v.customize [
+          'createmedium', 'disk',
+          '--filename', "$HOME/VirtualBox/okd311/master-two/sdb.vdi",
+          '--format', 'VDI',
+          '--size', 20 * 1024
+        ]
+        end
+        v.customize [
+       'storageattach', :id,
+       '--storagectl', 'IDE',
+       '--port', 1,
+       '--device', 0,
+       '--type', 'hdd',
+       '--medium', "$HOME/VirtualBox/okd311/master-two/sdb.vdi"
+        ]
+      end
+  end
+
+  config.vm.define "master-three-okd11" do |app|
+      app.vm.box = "centos/7"
+      app.vm.hostname = "master-three.192.168.33.9.xip.io"
+      app.vm.network "private_network", ip: "192.168.33.9"
+      app.vm.provider "virtualbox" do |v|
+          v.name = "master-three-okd11"
+          v.memory = 3000
+          v.cpus = 1
+          #
+           # Add first disk
+          #
+          unless File.exists?("$HOME/VirtualBox/okd311/master-three/sdb.vdi")
+          v.customize [
+            'createmedium', 'disk',
+            '--filename', "$HOME/VirtualBox/okd311/master-three/sdb.vdi",
+            '--format', 'VDI',
+            '--size', 20 * 1024
+          ]
+          end
+          v.customize [
+         'storageattach', :id,
+         '--storagectl', 'IDE',
+         '--port', 1,
+         '--device', 0,
+         '--type', 'hdd',
+         '--medium', "$HOME/VirtualBox/okd311/master-three/sdb.vdi"
+          ]
+      end
+  end
+
+  config.vm.define "infra-one-okd11" do |app|
+      app.vm.box = "centos/7"
+      config.disksize.size = '30GB'
+      app.vm.hostname = "infra-one.192.168.33.10.xip.io"
+      app.vm.network "private_network", ip: "192.168.33.10"
+      app.vm.provider "virtualbox" do |v|
+          v.name = "infra-one-okd11"
+          v.memory = 2000
+          v.cpus = 1
+          #
+           # Add first disk
+          #
+          unless File.exists?("$HOME/VirtualBox/okd311/infra-one/sdb.vdi")
+          v.customize [
+            'createmedium', 'disk',
+            '--filename', "$HOME/VirtualBox/okd311/infra-one/sdb.vdi",
+            '--format', 'VDI',
+            '--size', 20 * 1024
+          ]
+          end
+          v.customize [
+         'storageattach', :id,
+         '--storagectl', 'IDE',
+         '--port', 1,
+         '--device', 0,
+         '--type', 'hdd',
+         '--medium', "$HOME/VirtualBox/okd311/infra-one/sdb.vdi"
+          ]
+          end
+
+  end
+
+  config.vm.define "infra-two-okd11" do |app|
+      app.vm.box = "centos/7"
+      config.disksize.size = '30GB'
+      app.vm.hostname = "infra-two.192.168.33.11.xip.io"
+      app.vm.network "private_network", ip: "192.168.33.11"
+      app.vm.provider "virtualbox" do |v|
+          v.name = "infra-two-okd11"
+          v.memory = 2000
+          v.cpus = 1
+
+          #
+           # Add first disk
+          #
+          unless File.exists?("$HOME/VirtualBox/okd311/infra-two/sdb.vdi")
+          v.customize [
+            'createmedium', 'disk',
+            '--filename', "$HOME/VirtualBox/okd311/infra-two/sdb.vdi",
+            '--format', 'VDI',
+            '--size', 20 * 1024
+          ]
+          end
+          v.customize [
+         'storageattach', :id,
+         '--storagectl', 'IDE',
+         '--port', 1,
+         '--device', 0,
+         '--type', 'hdd',
+         '--medium', "$HOME/VirtualBox/okd311/infra-two/sdb.vdi"
+          ]
+          end
+  end
+
+  config.vm.define "app-one-okd11" do |app|
+      app.vm.box = "centos/7"
+      config.disksize.size = '20GB'
+      app.vm.hostname = "app-one.192.168.33.12.xip.io"
+      app.vm.network "private_network", ip: "192.168.33.12"
+      app.vm.provider "virtualbox" do |v|
+          v.name = "app-one-okd11"
+          v.memory = 1000
+          v.cpus = 1
+      #
+       # Add first disk
+      #
+      unless File.exists?("$HOME/VirtualBox/okd311/app-one/sdb.vdi")
+      v.customize [
+        'createmedium', 'disk',
+        '--filename', "$HOME/VirtualBox/okd311/app-one/sdb.vdi",
+        '--format', 'VDI',
+        '--size', 20 * 1024
+      ]
+      end
+      v.customize [
+     'storageattach', :id,
+     '--storagectl', 'IDE',
+     '--port', 1,
+     '--device', 0,
+     '--type', 'hdd',
+     '--medium', "$HOME/VirtualBox/okd311/app-one/sdb.vdi"
+      ]
+      end
+  end
+
+  config.vm.define "app-two-okd11" do |app|
+      app.vm.box = "centos/7"
+      config.disksize.size = '20GB'
+      app.vm.hostname = "app-two.192.168.33.13.xip.io"
+      app.vm.network "private_network", ip: "192.168.33.13"
+      app.vm.provider "virtualbox" do |v|
+          v.name = "app-two-okd11"
+          v.memory = 1000
+          v.cpus = 1
+      #
+       # Add first disk
+      #
+      unless File.exists?("$HOME/VirtualBox/okd311/app-two/sdb.vdi")
+      v.customize [
+        'createmedium', 'disk',
+        '--filename', "$HOME/VirtualBox/okd311/app-two/sdb.vdi",
+        '--format', 'VDI',
+        '--size', 20 * 1024
+      ]
+      end
+      v.customize [
+     'storageattach', :id,
+     '--storagectl', 'IDE',
+     '--port', 1,
+     '--device', 0,
+     '--type', 'hdd',
+     '--medium', "$HOME/VirtualBox/okd311/app-two/sdb.vdi"
+      ]
+  end
+end
+
+config.vm.define "gluster-one-okd11" do |app|
+    app.vm.box = "centos/7"
+    config.disksize.size = '20GB'
+    app.vm.hostname = "gluster-one.192.168.33.14.xip.io"
+    app.vm.network "private_network", ip: "192.168.33.14"
+    app.vm.provider "virtualbox" do |v|
+        v.name = "gluster-one-okd11"
+        v.memory = 2000
+        v.cpus = 1
+    #
+     # Add first disk
+    #
+    unless File.exists?("$HOME/VirtualBox/okd311/gluster-one/sdb.vdi")
+    v.customize [
+      'createmedium', 'disk',
+      '--filename', "$HOME/VirtualBox/okd311/gluster-one/sdb.vdi",
+      '--format', 'VDI',
+      '--size', 50 * 1024
+    ]
+    end
+    v.customize [
+   'storageattach', :id,
+   '--storagectl', 'IDE',
+   '--port', 1,
+   '--device', 0,
+   '--type', 'hdd',
+   '--medium', "$HOME/VirtualBox/okd311/gluster-one/sdb.vdi"
+    ]
+  end
+end
+
+
+config.vm.define "gluster-two-okd11" do |app|
+    app.vm.box = "centos/7"
+    config.disksize.size = '20GB'
+    app.vm.hostname = "gluster-two.192.168.33.15.xip.io"
+    app.vm.network "private_network", ip: "192.168.33.15"
+    app.vm.provider "virtualbox" do |v|
+        v.name = "gluster-two-okd11"
+        v.memory = 2000
+        v.cpus = 1
+    #
+     # Add first disk
+    #
+    unless File.exists?("$HOME/VirtualBox/okd311/gluster-two/sdb.vdi")
+    v.customize [
+      'createmedium', 'disk',
+      '--filename', "$HOME/VirtualBox/okd311/gluster-two/sdb.vdi",
+      '--format', 'VDI',
+      '--size', 50 * 1024
+    ]
+    end
+    v.customize [
+   'storageattach', :id,
+   '--storagectl', 'IDE',
+   '--port', 1,
+   '--device', 0,
+   '--type', 'hdd',
+   '--medium', "$HOME/VirtualBox/okd311/gluster-two/sdb.vdi"
+    ]
+  end
+end
+
+config.vm.define "gluster-three-okd11" do |app|
+    app.vm.box = "centos/7"
+    config.disksize.size = '20GB'
+    app.vm.hostname = "gluster-three.192.168.33.16.xip.io"
+    app.vm.network "private_network", ip: "192.168.33.16"
+    app.vm.provider "virtualbox" do |v|
+        v.name = "gluster-three-okd11"
+        v.memory = 2000
+        v.cpus = 1
+    #
+     # Add first disk
+    #
+    unless File.exists?("$HOME/VirtualBox/okd311/gluster-three/sdb.vdi")
+    v.customize [
+      'createmedium', 'disk',
+      '--filename', "$HOME/VirtualBox/okd311/gluster-three/sdb.vdi",
+      '--format', 'VDI',
+      '--size', 50 * 1024
+    ]
+    end
+    v.customize [
+   'storageattach', :id,
+   '--storagectl', 'IDE',
+   '--port', 1,
+   '--device', 0,
+   '--type', 'hdd',
+   '--medium', "$HOME/VirtualBox/okd311/gluster-three/sdb.vdi"
+    ]
+  end
+end
+
+  config.vm.define "master-one-okd11" do |app|
+      app.vm.box = "centos/7"
+      app.vm.hostname = "master-one.192.168.33.7.xip.io"
+      app.vm.network "private_network", ip: "192.168.33.7"
+      config.vm.provision "file", source: "./password/password.txt", destination: "/tmp/password.txt"
+      config.vm.provision "file", source: "./ansible_conf/ansible.cfg", destination: "/tmp/ansible.cfg"
+      config.vm.provision "file", source: "../ansible", destination: "/tmp/"
+      config.vm.provision "shell", path: "./bastion/configbastion.sh"
+      app.vm.provider "virtualbox" do |v|
+        v.name = "master-one-okd11"
+        v.memory = 3000
+        v.cpus = 1
+      #
+       # Add first disk
+      #
+      unless File.exists?("$HOME/VirtualBox/okd311/master-one/sdb.vdi")
+      v.customize [
+        'createmedium', 'disk',
+        '--filename', "$HOME/VirtualBox/okd311/master-one/sdb.vdi",
+        '--format', 'VDI',
+        '--size', 20 * 1024
+      ]
+      end
+      v.customize [
+     'storageattach', :id,
+     '--storagectl', 'IDE',
+     '--port', 1,
+     '--device', 0,
+     '--type', 'hdd',
+     '--medium', "$HOME/VirtualBox/okd311/master-one/sdb.vdi"
+      ]
+      end
+  end
+end

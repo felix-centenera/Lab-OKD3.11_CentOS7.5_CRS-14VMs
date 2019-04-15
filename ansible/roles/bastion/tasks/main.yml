@@ -1,0 +1,13 @@
+- name: Ensure required packages are installed
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ yum_packages }}"
+
+- name: DownLoad OKD 3.11 playbooks from https://github.com/openshift/openshift-ansible
+  git:
+    repo: 'https://github.com/openshift/openshift-ansible'
+    dest: release-3.11
+    version: release-3.11
+    clone: yes
+    update: no

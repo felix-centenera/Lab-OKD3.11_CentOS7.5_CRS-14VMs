@@ -1,0 +1,4 @@
+---
+- hosts: preparation
+  roles:
+    - preparation

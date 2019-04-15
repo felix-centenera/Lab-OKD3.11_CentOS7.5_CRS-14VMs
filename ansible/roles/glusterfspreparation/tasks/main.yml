@@ -1,0 +1,97 @@
+---
+
+- name: Add repository CentOS OpenShift Origin
+  yum_repository:
+    name: CentOS OpenShift Origin
+    description: CentOS OpenShift Origin
+    baseurl: http://mirror.centos.org/centos/7/paas/x86_64/openshift-origin311
+    gpgcheck: no
+    enabled: yes
+
+- name: Add repository Gluster3.12
+  yum_repository:
+    name: Gluster3.12
+    description: Gluster3.12
+    baseurl: http://mirror.centos.org/centos-7/7.6.1810/storage/x86_64/gluster-3.12/
+    gpgcheck: no
+    enabled: yes
+
+- name: Ensure required packages are installed
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ yum_packages }}"
+
+- name: Remove repository (and clean up left-over metadata)
+  yum_repository:
+    name: epel
+    state: absent
+  notify: yum-clean-metadata
+
+- name: Add repository Gluster4
+  yum_repository:
+    name: Gluster4
+    description: Gluster4
+    baseurl: http://mirror.centos.org/centos/7/storage/x86_64/gluster-4.0/
+    gpgcheck: no
+    enabled: yes
+
+- name: Install gluster-block
+  shell: yum install gluster-block -y
+
+- name: Remove repository Gluster4 (and clean up left-over metadata)
+  yum_repository:
+    name: Gluster4
+    state: absent
+  notify: yum-clean-metadata
+
+- name: enable firewalld service
+  service: name=firewalld enabled=true state=started
+
+- name: start firewalld
+  service: name=firewalld state=restarted enabled=true
+
+- name: Enable firewall GlusterFS both runtime
+  shell: firewall-cmd  --add-port=24010/tcp --add-port=3260/tcp --add-port=111/tcp --add-port=22/tcp --add-port=24007/tcp --add-port=24008/tcp --add-port=49152-49664/tcp
+
+- name: Enable firewall GlusterFS permanent configurations
+  shell: firewall-cmd  --add-port=24010/tcp --add-port=3260/tcp --add-port=111/tcp --add-port=22/tcp --add-port=24007/tcp --add-port=24008/tcp --add-port=49152-49664/tcp --permanent
+
+- name: modprobe target_core_user
+  shell: modprobe target_core_user
+
+- name: modprobe dm_thin_pool
+  shell: modprobe dm_thin_pool
+
+- name: modprobe dm_multipath
+  shell: modprobe dm_multipath
+
+- name: virt_sandbox_use_fusefs on
+  shell: setsebool -P virt_sandbox_use_fusefs on
+
+- name: setsebool
+  shell: setsebool -P virt_use_fusefs on
+
+- name: Copy dm_thin_pool.conf configuration file
+  template:
+   src: dm_thin_pool.conf.j2
+   dest: /etc/modules-load.d/dm_thin_pool.conf
+   mode: 0644
+
+- name: Copy target_core_user.conf configuration file
+  template:
+   src: target_core_user.conf.j2
+   dest: /etc/modules-load.d/target_core_user.conf
+   mode: 0644
+
+- name: Copy dm_multipath.conf configuration file
+  template:
+   src: dm_multipath.conf.j2
+   dest: /etc/modules-load.d/dm_multipath.conf
+   mode: 0644
+
+- name: start glusterd
+  service: name=glusterd state=restarted enabled=true
+
+- name: enable glusterd service
+  service: name=glusterd enabled=true state=started

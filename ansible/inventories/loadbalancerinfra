@@ -1,0 +1,7 @@
+[loadbalancerinfra]
+lb-infra.192.168.33.5.xip.io
+lb-infra.192.168.33.6.xip.io
+
+[loadbalancerinfra:vars]
+ansible_user=root
+yum_packages=['keepalived','haproxy','psmisc']

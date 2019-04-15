@@ -1,0 +1,4 @@
+---
+- hosts: role_bastion
+  roles:
+    - bastion

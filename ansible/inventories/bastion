@@ -1,0 +1,9 @@
+[role_bastion]
+master-one.192.168.33.7.xip.io
+
+[role_bastion:vars]
+ansible_user=root
+#ansible_become=true
+
+# yum_packages=['git','wget','net-tools','bind-utils','yum-utils','iptables-services','bridge-utils','bash-completion','kexec-tools','sos','psacct', 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm','pyOpenSSL']
+yum_packages=['git','wget']

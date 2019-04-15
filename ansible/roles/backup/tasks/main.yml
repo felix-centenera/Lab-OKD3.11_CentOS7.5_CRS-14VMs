@@ -1,0 +1,43 @@
+---
+
+- name: Create backup folder
+  file:
+    path: /backup/{{inventory_hostname}}
+    state: directory
+    mode: 0755
+
+- name: Create scripts backup folder
+  file:
+    path: /backup/backupscripts
+    state: directory
+    mode: 0755
+
+- name: Load script backup in all the machines
+  template:
+    src: backup_master_node.sh.j2
+    dest: /backup/backupscripts/backup_master_node.sh
+
+- name: Execute the script
+  command: sh /backup/backupscripts/backup_master_node.sh
+
+- name: Tar backup created
+  archive:
+    path: /backup/{{inventory_hostname}}/
+    dest: /backup/{{inventory_hostname}}.tgz
+
+
+- name: Remove backup files not Compress
+  file:
+    path: /backup/{{inventory_hostname}}
+    state: absent
+
+- name:
+  fetch:
+    src: /backup/{{inventory_hostname}}.tgz
+    dest: /backup/cluster_ocp_backup/{{ lookup('pipe','date +%Y-%m-%d-%H:%M') }}
+    mode: 0755
+
+- name: Remove backup files Compress
+  file:
+    path: /backup/{{inventory_hostname}}.tgz
+    state: absent

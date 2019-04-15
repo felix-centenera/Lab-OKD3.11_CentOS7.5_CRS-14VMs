@@ -1,0 +1,4 @@
+---
+- hosts: role_master
+  roles:
+    - etcdbackup

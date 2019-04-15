@@ -1,0 +1,51 @@
+global
+    log                 127.0.0.1 local0
+    chroot              /var/lib/haproxy
+    pidfile             /var/run/haproxy.pid
+    maxconn         4000
+    user                haproxy
+    group               haproxy
+    daemon
+defaults
+    mode                        http
+    log                         global
+    option                      httplog
+    option                      dontlognull
+    option             http-server-close
+    option     forwardfor       except 127.0.0.0/8
+    option                      redispatch
+    retries                     3
+    timeout http-request    10s
+    timeout queue           1m
+    timeout connect         10s
+    timeout client              1m
+    timeout server          1m
+    timeout http-keep-alive     10s
+    timeout check           10s
+
+#Stats
+listen stats :1936
+    mode http
+    stats enable
+    stats uri /haproxy?stats
+    stats realm Strictly\ Private
+    stats auth admin:admin
+
+# OpenShift Management UI URL
+listen apache-8443
+  bind 192.168.33.20:8443
+  mode tcp
+  balance source
+  server cfme1 192.168.33.7:8443 check inter 1s
+  server cfme2 192.168.33.8:8443 check inter 1s
+  server cfme3 192.168.33.9:8443 check inter 1s
+
+
+# OpenShift Management UI URL
+listen apache-8443
+  bind 192.168.33.21:8443
+  mode tcp
+  balance source
+  server cfme1 192.168.33.7:8443 check inter 1s
+  server cfme2 192.168.33.8:8443 check inter 1s
+  server cfme3 192.168.33.9:8443 check inter 1s

@@ -1,0 +1,5 @@
+---
+-
+  hosts: loadbalancermaster
+  roles:
+    - role: loadbalancermaster
