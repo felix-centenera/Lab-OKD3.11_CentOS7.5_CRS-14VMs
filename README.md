@@ -9,7 +9,7 @@ Description
 
 *  You can change the harware definition of the VirtualMachines in the vagrantfile configuration. "vagrant/vagrantfile".
 
-* Vagrant confira will create the disks under $HOME/VirtualBox/, default $Home for VirtualHost. You can change this path in the vagrantfile configuration. "vagrant/vagrantfile".
+* Vagrant will create the disks under $HOME/VirtualBox/, default $Home for VirtualHost. You can change this path in the vagrantfile configuration. "vagrant/vagrantfile".
 
 
 Tested under the next Configuration
